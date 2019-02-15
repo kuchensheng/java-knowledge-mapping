@@ -1,4 +1,6 @@
 # Java集合框架
+- [ArrayList](#ArrayList)
+- [HashMap的底层实现](#HashMap的底层实现)
 ## ArrayList
   * ArrayList的底层是数组队列，相当于动态数组。与Java中的数组相比，它的容量动态增长。在大量添加元素前，应用程序可以使用ensureCapacity操作来增加ArrayList的容量。这可以减少递增式再分配的数量。
   * ArrayList集成于AbstractList，实现了List，Cloneable，RandomAccess和Serializable接口。
