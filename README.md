@@ -1,9 +1,9 @@
 # 目录
 + Java
-  - [Java/J2EE基础知识](#javaj2ee基础知识)
+  - [Java基础知识](#java基础知识)
   
   
-## Java/J2EE基础知识 
+## Java基础知识 
 ### String StringBuilder和StringBuffer的区别
 + 可变性
 
@@ -112,6 +112,11 @@
   
   3.hashCode()的默认行为是对堆上的对象产生独特值，如果没有重写hashCode()，则该class的两个对象无论如何都不会相等的
   
+## Java集合框架
+### ArrayList与LinkedList异同
++ 是否保证线程安全：ArrayList和LinkedList都是不同步的，也就是不保证线程安全
++ 底层数据结构：ArrayList底层使用的是Object数组；LinkedList底层使用的是双向链表（JDK6之前是循环链表，JDK7取消了循环）
++ 插入和删除是否受元素位置的影响：ArrayList采用数组存储，所以掺入和删除元素的时间复杂度受元素位置的影响。入股执行add（E e）方法的时候，ArrayList会默认在将在
 
 
 
