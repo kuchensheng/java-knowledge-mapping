@@ -130,8 +130,27 @@ ArrayList不是同步的，所以不需要在保证线程安全时建议使用Ar
 ### HashMap的底层实现
 JDK1.8之前，HashMap底层是**数组和链表**结合在一起使用的也就是链表散列。hashMap**通过Key的hashCode经过扰动函数处理过后得到哈希值，然后通过（n-1） & hash判断当前元素存放的位置（这里的n指的是数组的长度），如果当前位置存在元素的话，就判断该元素与要存入的元素的hash值以及key是否相同，如果相同，则直接覆盖，不相同，则通过拉链法解决冲突。**。JDK1.8之后，HashMap底层采用的是**数组+链表/红黑树**，当链表长度大于阈值（默认为8）时，将链表转化为红黑树，以减少搜索时间。
 所谓扰动函数指的就是HashMap的hash方法。使用hash方法是为了防止一些实现比较差的hashCode()方法，减少发生碰撞的概率。
-所谓**拉链法**：就是将链表和数组相结合。也就是说创建一个链表数组，数组中每一格就是一个链表。若遇到哈希冲突，则将冲突的值加到链表中
+所谓**拉链法**：就是将链表和数组相结合。也就是说创建一个链表数组，数组中每一格就是一个链表。若遇到哈希冲突，则将冲突的值加到链表中.
+JDK1.8之后的版本可以查看文件《JDK 1.8 重新认识HashMap》
+### HashMap和HashTable的区别
+1.线程是否安全：HashMap是非线程安全的，HashTable是线程安全的；HashTable内部的方法基本基本都经过synchronized修饰。
+2.效率：因为线程安全问题，HashMap比HashTable的效率更高一点，另外说明，HashTable基本被淘汰，不要在代码中使用它，如果要保证线程安全，还是使用ConcurrentHashMap。
+3.对Null key和Null value的支持。HashMap中，最多一个key为null，可以多个value=null。HashTable中不能有键或值为null。
+4.初始容量的大小和每次扩容大小的不同：创建时如果不指定容量初始值，Hashtable 默认的初始大小为11，之后每次扩充，容量变为原来的2n+1。HashMap 默认的初始化大小为16。之后每次扩充，容量变为原来的2倍。
+5.底层数据结构：JDK1.8 以后的 HashMap 在解决哈希冲突时有了较大的变化，当链表长度大于阈值（默认为8）时，将链表转化为红黑树，以减少搜索时间。Hashtable 没有这样的机制。
 
+### ConcurrentHashMap和HashTable的区别
+ConcurrentHashMap 和 Hashtable 的区别主要体现在实现线程安全的方式上不同。
++ 底层数据结构：JDK1.7的 ConcurrentHashMap 底层采用 **分段的数组+链表**实现，JDK1.8 采用的数据结构跟HashMap1.8的结构一样，**数组+链表/红黑二叉树**。Hashtable和JDK1.8之前的HashMap 的底层数据结构类似都是采用数组+链表 的形式，数组是HashMap的主体,链表则是主要为了解决哈希冲突而存在的；
++ 实现线程安全的方式
+  * 在JDK1.7的时候，ConcurrentHashMap（分段锁）对整个桶数组进行了分割分段（Segment），每一把锁只锁容器中的一部分数据，多线程访问容器里不同数据段的数据，就不会存在锁竞争，提高并发访问率。到了JDK1.8的时候已经摒弃了Segment的概念，而是直接使用Node数组+链表+红黑树的数据结构来实现，并发控制使用了synchronized和CAS来操作。整个看起来就像是优化过且线程安全的HashMap，最燃在JDK1.8中还能看到Segment的数据结构，但是已经简化了属性，只是为了兼容旧版本。HashTable使用了synchronized（同一把锁）来保证线程安全，效率非常低下。当一个线程访问同步方法时，其他线程也访问同步方法，可能会进入阻塞或轮询状态，如果使用put添加元素，另一个线程不能使用put添加元素，也不能使用get，竞争会越来越激烈，效率也会越来越低下。二者的比较图。
+![HashTable](https://camo.githubusercontent.com/b8e66016373bb109e923205857aeee9689baac9e/687474703a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f31382d382d32322f35303635363638312e6a7067)
+
+![JDK1.7的ConcurrentHashMap](https://camo.githubusercontent.com/443af05b6be6ed09e50c78a1dca39bf75acb106d/687474703a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f31382d382d32322f33333132303438382e6a7067)
+
+![JDK1.8的ConcurrentHashMap](https://camo.githubusercontent.com/2d779bf515db75b5bf364c4f23c31268330a865e/687474703a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f31382d382d32322f39373733393232302e6a7067)
+ConcurrentHashMap取消了Segment分段锁，采用CAS和synchronized来保证并发安全。数据结构跟HashMap1.8的结构类似，数组+链表/红黑二叉树。
+synchronized只锁定当前链表或红黑二叉树的首节点，这样只要hash不冲突，就不会产生并发，效率又提升N倍。
 
 
 
