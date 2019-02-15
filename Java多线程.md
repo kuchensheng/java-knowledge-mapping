@@ -87,4 +87,4 @@ volatile不能保证对变量的原子性。它仅仅保证了共享变量对各
 |wait(long，int)	|对于超时时间更细力度的控制，可以达到纳秒|
 
 ### 线程的基本状态
-![线程基本状态](https://user-gold-cdn.xitu.io/2018/3/25/1625c6841963873b?w=876&h=492&f=png&s=-1)
+![线程基本状态](imgs/multiThread.jpg)
