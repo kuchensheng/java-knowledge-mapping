@@ -86,8 +86,12 @@ volatile不能保证对变量的原子性。它仅仅保证了共享变量对各
 |wait(long)	|超时等待一段时间，这里的参数时间是毫秒，也就是等待长达n毫秒，如果没有通知就超时返回|
 |wait(long，int)	|对于超时时间更细力度的控制，可以达到纳秒|
 
+**除此之外，也可以利用Condition接口的await/signal来实现等待/通知机制**
 ### ThreadLocal的使用
 ThreadLocal，即线程变量，是一个以ThreadLocal对象为键、任意对象为值的存储结构。这个结构被附带在线程上，也就说一个线程可以根据一个ThreadLocal对象查询到绑定在这个线程上的一个值
 
 ### 线程的基本状态
 ![线程基本状态](imgs/multiThread.jpg)
+
+### 线程池与Executor框架
+见![Java多线程学习（八）线程池与Executor 框架](https://blog.csdn.net/qq_34337272/article/details/79959271)
