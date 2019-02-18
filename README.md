@@ -1,7 +1,7 @@
 # **Java工程师知识扫盲**
 我正在对Java知识进行一个系统的整理，以前也零零碎碎的写了一些博客、笔记。现在整理起来，方便学些和查阅。
 
-![猪小屁](https://avatars1.githubusercontent.com/u/19823402?s=460&v=4)
+![猪小屁](imgs/index.png)
 
 # 目录
 + Java
