@@ -124,8 +124,60 @@
   2. 如果两个对象的hashCode相等，它们也不一定相等。因此equals()方法被覆盖的，则hashCode一定也必须被覆盖
   
   3.hashCode()的默认行为是对堆上的对象产生独特值，如果没有重写hashCode()，则该class的两个对象无论如何都不会相等的
+
+  ### Java反射的实现原理
+  **Java反射实例**
+  ```
+  public class ReflectCase {
+    public static void main(String[] args) throws Exception {
+      Proxy target = new Proxy();
+      Method method = Proxy.class.getDeclaredMethod("run");
+      method.invoke(target);
+    }
+    static class Proxy {
+      public void run() {
+        System.out.println("runing...");
+      }
+    }
+  }
+  ```
   
-  
+Java 反射机制可以在运行期间调用对象的任何方法。
+
+**Method获取**
+调用class类的getDeclaredMethod()可以获取指定方法名和参数的方法对象Method。源码：
+```
+@CallerSensitive
+  public Method getDeclaredMethod(String name, Class<?>... parameterTypes)
+        throws NoSuchMethodException, SecurityException {
+      checkMemberAccess(Member.DECLARED, Reflection.getCallerClass(), true);
+      //privateGetDeclaredMethods()从缓存中或JVM中获取该class中声明的方法列表
+      //searchMethods()将从返回的方法列表中找到一个匹配名称和参数的方法对象
+      Method method = searchMethods(privateGetDeclaredMethods(false), name, parameterTypes);
+      if (method == null) {
+          throw new NoSuchMethodException(getName() + "." + name + argumentTypesToString(parameterTypes));
+      }
+      return method;
+    }
+private static Method searchMethods(Method[] methods,
+                                        String name,
+                                        Class<?>[] parameterTypes)
+    {
+        Method res = null;
+        String internedName = name.intern();
+        for (int i = 0; i < methods.length; i++) {
+            Method m = methods[i];
+            if (m.getName() == internedName
+                && arrayContentsEq(parameterTypes, m.getParameterTypes())
+                && (res == null
+                    || res.getReturnType().isAssignableFrom(m.getReturnType())))
+                res = m;
+        }
+        //如果匹配不到，则重新copy一份返回，即Method.copy()方法
+        return (res == null ? res : getReflectionFactory().copyMethod(res));
+    }
+```
+
 
 
 

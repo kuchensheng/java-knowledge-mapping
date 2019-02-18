@@ -109,6 +109,43 @@ Java中的线程池时运用场景最多的并发框架，几乎所有需要异�
 2) 线程池判断工作队列是否已满。如果工作队列没有满，则将新提交的任务存储在这个工作队列里。如果工作队列满了，则进入第三步
 3) 线程池判断线程池里的线程是否都处于工作状态。如果没有，则创建一个新的工作线程来执行任务。如果已经满了，则交给饱和处理策略来处理这个任务
 
+**ThreadPoolExecutor**
+Executors是java线程池的工厂类，通过它可以快速初始化一个符合业务需求的线程池，如Executors.newFixedThreadPool方法可以生成一个拥有固定线程数的线程池。
+
+```
+public static ExecutorService newFixedThreadPool(int nThreads) {
+        return new ThreadPoolExecutor(nThreads, nThreads,
+                                      0L, TimeUnit.MILLISECONDS,
+                                      new LinkedBlockingQueue<Runnable>());
+    }
+```
+
+其本质也是通过不同的参数初始化一个ThreadPoolExecutor对象，具体参数描述如下：
+
+**corePoolSize**
+
+线程池中的核心线程数，当提交一个任务时，线程池创建一个新线程执行任务，直到当前线程数等于corePoolSize；如果当前线程数为corePoolSize，继续提交的任务被保存到阻塞队列中，等待被执行；如果执行了线程池的prestartAllCoreThreads()方法，线程池会提前创建并启动所有核心线程。
+
+**maximumPoolSize**
+
+线程池中允许的最大线程数。如果当前阻塞队列满了，且继续提交任务，则创建新的线程执行任务，前提是当前线程数小于maximumPoolSize
+
+**keepAliveTime**
+
+线程空闲时的存活时间，即当线程没有任务执行时，继续存活的时间；默认情况下，该参数只在线程数大于corePoolSize时才有用
+
+**unit**
+
+keepAliveTime的单位；
+
+**workQueue**
+
+用来保存等待被执行的任务的阻塞队列，且任务必须实现Runable接口，在JDK中提供了如下阻塞队列：
+1、ArrayBlockingQueue：基于数组结构的有界阻塞队列，按FIFO排序任务；
+2、LinkedBlockingQuene：基于链表结构的阻塞队列，按FIFO排序任务，吞吐量通常要高于ArrayBlockingQuene；
+3、SynchronousQuene：一个不存储元素的阻塞队列，每个插入操作必须等到另一个线程调用移除操作，否则插入操作一直处于阻塞状态，吞吐量通常要高于LinkedBlockingQuene；
+4、priorityBlockingQuene：具有优先级的无界阻塞队列；
+
 #### 线程池的使用
 见[Java多线程学习（八）线程池与Executor 框架](https://blog.csdn.net/qq_34337272/article/details/79959271)
 
