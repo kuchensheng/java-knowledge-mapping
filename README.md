@@ -16,7 +16,8 @@
   - [虚拟机类加载机制浅析](虚拟机类加载机制.md)
 + 设计模式
   - [图解设计模式](设计模式.md)
-  
++ Kafka
+  - [Kafka入门](kafka.md)
 ## Java基础知识 
 ### String StringBuilder和StringBuffer的区别
 + 可变性
