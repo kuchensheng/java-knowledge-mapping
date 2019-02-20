@@ -95,7 +95,7 @@ spring:
 
 * Eureka SERVER是有界面的，启动工程，访问http://localhost:8761 ,界面如下：
 
-![Eureka server界面](imgs/eureka.png)
+![Eureka server界面](../imgs/eureka.png)
 
 ### 创建服务提供者
 当client向server注册时，它会提供一些元数据，例如主机和端口，URL，主页等。Eureka server从每个client实例接收心跳消息。如果心跳超时，则通常将该实例从注册server中删除。
@@ -171,7 +171,7 @@ eureka:
 
 **需要指明spring.application.name**,这个很重要，这在以后的服务与服务之间相互调用一般都是根据这个name 。 启动工程，打开http://localhost:8761 
 
-![Eureka server](imgs/eureka_1.png)
+![Eureka server](../imgs/eureka_1.png)
 
 你会发现一个服务已经注册在服务中了，服务名为SERVICE-HI ,端口为7862
 
