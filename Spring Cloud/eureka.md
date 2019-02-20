@@ -3,7 +3,7 @@
 + [服务治理](#服务治理)
 + [创建服务注册中心](#创建服务注册中心)
 + [创建服务提供者](#创建服务提供者)
-+ [高可用服务注册中心](#高可用服务注册中心)
++ [高可用服务注册中心](#高可用注册中心)
 + [Eureka详解](#Eureka详解)
 
 # 服务治理：Spring Cloud Eureka
@@ -95,7 +95,7 @@ spring:
 
 * Eureka SERVER是有界面的，启动工程，访问http://localhost:8761 ,界面如下：
 
-![Eureka server](imgs/eureka.png)
+![Eureka server界面](imgs/eureka.png)
 
 ### 创建服务提供者
 当client向server注册时，它会提供一些元数据，例如主机和端口，URL，主页等。Eureka server从每个client实例接收心跳消息。如果心跳超时，则通常将该实例从注册server中删除。
