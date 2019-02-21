@@ -22,9 +22,11 @@
     * [服务的注册与发现Eureka](SpringCloud/eureka.md)
     * [服务的注册于发现Zookeeper](SpringCloud/zookeeper.md)
     * [客户端的负载均衡Ribbon](SpringCloud/ribbon.md)
-    * [分布式服务跟踪Sleuth](SpringCloud/Sleuth)
+    * [分布式服务跟踪Sleuth](SpringCloud/Sleuth.md)
+    * [分布式服务框架序列化和反序列化](SpringCloud/serialize.md)
 + Kafka
   - [Kafka入门](kafka.md)
+
 ## Java基础知识 
 ### String StringBuilder和StringBuffer的区别
 + 可变性

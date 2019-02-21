@@ -66,6 +66,20 @@ Zookeeper主要为了统一分布式系统中各个节点的工作状态，在�
 |ZkClient(IZkConnection connection)|connection IZkConnection接口自定义实现| |
 |ZkClient(IZkConnection connection, int connectionTimeout)|| |
 |ZkClient(IZkConnection zkConnection, int connectionTimeout, ZkSerializer zkSerializer)|| |
-|subscribeChildChanges(String path, IZkChildListener listener)||注册监听器listener，监听路径path下子节点的变化 |
-|ZkClient(IZkConnection connection, int connectionTimeout)|| |
-|ZkClient(IZkConnection connection, int connectionTimeout)|| |
+|void createEphemeral(final String path)| | 创建临时节点 |
+|void createEphemeral(final String path,final Object data)|path 临时节点,data 数据信息|创建临时节点，同时写入data数据 |
+|void createEphemeralSequential(final String path,final Object data)| |创建有序临时节点，同时写入data数据|
+|void createPersistent(String path)| | 创建持久节点 |
+|void createPersistent(String path，Object data)| | 创建持久节点，同时写入数据 |
+|void createPersistent(String path，boolean createParents)| | 创建持久节点,若父节点不存在，可自动创建父节点|
+|void createPersistentSequential(String path，Object data)| | 创建有序持久节点，同时写入数据 |
+|boolean delete(final String path)| | 删除指定节点|
+|boolean deleteRecursive(String path)| | 递归删除path路径的所有节点|
+|List<String> getChildren(String path) | |获取指定节点的子节点列表|
+|subscribeChildChanges(String path, IZkChildListener listener)| |注册监听器listener，监听路径path下子节点的变化 |
+|subscribeChildChanges(String path, IZkDataListener listener)| |注册监听器listener，监听路径path下子节点数据的变化 |
+|<T extends Object> T readData(String path)| |读取数据|
+|<T extends Object> T readData(String path,boolean returnNullIfPathNotExists)| |读取数据,若节点不存在，则返回null|
+|<T extends Object> T readData(String path,Stat stat)|stat 指定状态|指定节点的状态信息，读取节点数据|
+|void writeData(final String path,Object data)| |写入或更新数据|
+|void writeData(final String path,Object data,final int exceptedVersion)| |写入或更新预期数据版本的节点数据|
