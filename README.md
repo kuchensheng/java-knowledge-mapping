@@ -22,6 +22,7 @@
     * [服务的注册与发现Eureka](SpringCloud/eureka.md)
     * [服务的注册于发现Zookeeper](SpringCloud/zookeeper.md)
     * [客户端的负载均衡Ribbon](SpringCloud/ribbon.md)
+    * [分布式服务跟踪Sleuth](SpringCloud/Sleuth)
 + Kafka
   - [Kafka入门](kafka.md)
 ## Java基础知识 
