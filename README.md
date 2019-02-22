@@ -24,6 +24,7 @@
     * [客户端的负载均衡Ribbon](SpringCloud/ribbon.md)
     * [分布式服务跟踪Sleuth](SpringCloud/Sleuth.md)
     * [分布式服务框架序列化和反序列化](SpringCloud/serialize.md)
+    * [服务容错保护Hystrix](SpringCloud/hystrix.md)
 + Kafka
   - [Kafka入门](kafka.md)
 
