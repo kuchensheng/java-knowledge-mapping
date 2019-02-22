@@ -27,6 +27,8 @@
     * [服务容错保护Hystrix](SpringCloud/hystrix.md)
 + Kafka
   - [Kafka入门](kafka.md)
++ 缓存
+    * [Redis入门](redis.md)
 
 ## Java基础知识 
 ### String StringBuilder和StringBuffer的区别
