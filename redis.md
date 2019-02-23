@@ -88,3 +88,26 @@ Redis集合和列表的不同之处在于，列表可以存储多个相同的字
 
 |命令|用例和描述|
 | ---- | ---- |
+|SADD key item|将给定元素添加到集合|
+|SMEMBERS key|返回集合包含的所有元素|
+|SISMEMBER key item|检查给定元素是否存在与集合中|
+|SREM key item|删除给定元素|
+
+## 4.散列Hash
+Redis的散列可以存储多个键值对之间的映射关系。存储结构类似于Map<key,Map<subKey,item>>
+
+|命令|用例和描述|
+| ---- | ---- |
+|HSET key subKey item|在散列里面关联给给定的键值对(新增)|
+|HGET key subKey|获取指定散列键的值|
+|HGETDETAIL key|获取散列包含的所有键值对|
+|HDEL key subKey|删除元素|
+
+## 5.有序集合
+
+|命令|用例和描述|
+| ---- | ---- |
+|ZADD| |
+|ZREM| |
+|ZCARD| |
+|ZINCRBY| |
