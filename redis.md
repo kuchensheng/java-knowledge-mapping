@@ -71,8 +71,14 @@ Redis中字符串操作命令
 |GET key|获取存储在给定键中的值|
 |SET key value|设置存储在给定键中的值|
 |DEL key|删除给定键的值|
+|INCR key|将键存储值+1|
+|DECR key|将键存储值-1|
+|APPNED key value|将值value追加到末尾|
+
+![redis_string](imgs/redis_string.png)
 
 ## 2.列表List
+redis列表允许用户从列表的两端推入或者弹出元素，以及执行各种常见的列表操作。除此之外，还可以作为阻塞队列使用。
 
 |命令|用例和描述|
 | ---- | ---- |
@@ -82,9 +88,85 @@ Redis中字符串操作命令
 |LPOP key|从列表右端弹出元素|
 |LRANGE key start end|获取列表在给定范围上的所有值，-1表示取出所有元素|
 |LINDEX key index|获取列表在给定位置上的单个元素|
+|BLPOP key-name [key-name ...] timeout|从第一个非空列表中弹出最左端元素，或者在timeout秒内阻塞并等待可弹出的元素出现|
+
+
+![redis_list](imgs/redis_list.png)
 
 ## 3.集合Set
 Redis集合和列表的不同之处在于，列表可以存储多个相同的字符串，而集合通过使用散列来保证自己存储的每个字符串都是不同的。
 
 |命令|用例和描述|
 | ---- | ---- |
+|SADD key item|将给定元素添加到集合|
+|SMEMBERS key|返回集合包含的所有元素|
+|SISMEMBER key item|检查给定元素是否存在与集合中|
+|SREM key item|删除给定元素|
+|SPOP key|随机地移除集合中一个元素，并返回|
+|SDIFF key-name [key-name ...]|差集运算|
+|SINTER key-name[key-name ...]|交集运算|
+|SUNION key-name[key-name ...]|并集运算|
+
+![redis_set](imgs/redis_set.png)
+
+## 4.散列Hash
+Redis的散列可以存储多个键值对之间的映射关系。存储结构类似于Map<hashKey,Map<subKey,item>>
+
+|命令|用例和描述|
+| ---- | ---- |
+|HSET key subKey item|在散列里面关联给给定的键值对(新增)|
+|HGET key subKey|获取指定散列键的值|
+|HGETDETAIL key|获取散列包含的所有键值对|
+|HDEL key subKey|删除元素|
+|HMSET key-name key value [key value ...]|为散列里添加一个或多个键值对|
+|HMGET key-name key [key ...]|从散列中获取一个或多个键的值|
+|HKEYS key-name |获取散列中包含的所有的键|
+|HVALS key-name |获取散列中包含的所有的值|
+
+![redis_hash](imgs/redis_hash.png)
+
+## 5.有序集合
+
+|命令|用例和描述|
+| ---- | ---- |
+|ZADD key-name score member [score memeber ...]|将带有给定分值的成员添加到有序集合|
+|ZREM key-name member|移除给定的成员|
+|ZCARD key-name|返回有序集合包含的成员数量|
+|ZRANGE key start stop [withscores]|返回有序集合中排名介于start和stop之间的成员。|
+
+![redis_zset](imgs/redis_zset.png)
+
+## 6.发布/订阅
+订阅者（listener）负责订阅频道（channel），发送者（publisher）负责向频道发送二进制字符串消息。每当有消息被发送到给定频道，频道的所有订阅者都会受到消息。
+
+|命令|用例和描述|
+| ---- | ---- |
+|SUBSCRIBE channel [channel ...]|订阅给定的一个或多个频道|
+|UNSUBSCRIBE [channel [channel ...]]|取消订阅给定的一个或多个频道，如果不指定channel，将取消订阅所有的频道|
+|PSUBSCRIBE pattern [pattern ...]|订阅与正则匹配的所有频道|
+|PUNSUBSCRIBE [pattern [pattern ...]]|取消订阅与正则匹配的所有频道，如果不指定pattern，将取消订阅所有的频道|
+|PUBLISH channel message|向给定频道发送消息|
+
+**注意**：不建议使用redis的发布订阅模式：
+
+* 1. redis系统稳定性。如果发生消息堆积，可能会导致redis的速度变慢，甚至直接崩溃。
+* 2. 数据传输可靠性。如果客户端在执行订阅操作过程中短线，那么客户端将丢失在短线期间发送的所有消息。
+
+## 7.redis对事务的支持
+事务：一组相关的操作是原子性的，要么都执行，要么都不执行；一组事务，要么成功，要么撤回。redis通过multi、exec等命令实现事务功能。
+
+![redis_multi](imgs/redis_multi.png)
+
+## 8. redis键的过期时间
+redis的过期时间（expiration）特性让一个键在给定的时限之后自动删除。
+
+|命令|用例和描述|
+| ---- | ---- |
+|EXPIRE key-name seconds|让给定键在指定的秒数之后过期|
+|PEXPIRE key-name millionseconds|让给定键在指定的毫秒数之后过期|
+|EXPIREAT key-name timestamp|将给定键的过期时间设置为给到给定的UNIX时间戳|
+|TTL key-name|查看给定键距离过期还有多少秒|
+|PTTL key-name|查看给定键距离过期还有多少毫秒|
+
+# 数据安全与性能保障
+## 1.Redis持久化
