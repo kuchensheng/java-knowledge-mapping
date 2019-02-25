@@ -29,6 +29,8 @@
   - [Kafka入门](kafka.md)
 + 缓存
     * [Redis入门](redis.md)
++ 数据库
+    * [Mysql入门](Mysql/Mysql入门.md)
 
 ## Java基础知识 
 ### String StringBuilder和StringBuffer的区别
