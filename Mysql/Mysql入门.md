@@ -1,7 +1,7 @@
 # Mysql入门
 ## 1.Mysql逻辑架构
 
-![Mysql](imgs/mysql.png)
+![Mysql](../imgs/mysql.png)
 
 MySQL逻辑架构整体分为三层，最上层为客户端层，并非MySQL所独有，诸如：连接处理、授权认证、安全等功能均在这一层处理。
 
