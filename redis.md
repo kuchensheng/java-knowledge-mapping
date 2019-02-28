@@ -1,4 +1,4 @@
-# 缓存
+# 1. 缓存
 用缓存，主要有两个用途：高性能、高并发
 
 **高性能**
@@ -17,7 +17,7 @@ mysql这么重的数据库，压根儿设计不是让你玩儿高并发的，虽
 缓存是走内存的，内存天然就支撑高并发。
 ```
 
-## 缓存选型
+## 1.1 缓存选型
 目前一般用的缓存是redis和memcached。各大BBS上都有这两项比对。这里只简单说明一下：
 
 + Redis支持复杂的数据结构
@@ -36,7 +36,7 @@ Redis性能极高：Redis能读的速度是110000次/s,写的速度是81000次/s
 
 ![Redis线程模型](imgs/redis-single-thread-model.png)
 
-# 什么是Redis
+# 2. 什么是Redis
 Redis是完全开源的、基于内存的、高性能键值对数据库。它具备以下特性：
 + 丰富的存储结构
 
@@ -53,11 +53,11 @@ Redis还支持 publish/subscribe, 通知, key 过期等等特性。
 
 Redis数据库中的所有数据都存储在内存中。由于内存的读写速度远快于硬盘，因此Redis在性能上对比基于硬盘的数据库有非常明显优势。除此之外，Redis支持复制和持久化以及客户端分片，用户很方便地就可以将Redis扩展。
 
-# [Redis安装](http://www.runoob.com/redis/redis-install.html)
+# 3. [Redis安装](http://www.runoob.com/redis/redis-install.html)
 
-# Redis 基本命令
+# 4. Redis 基本命令
 
-## 1.字符串String
+## 4.1.字符串String
 在Redis里，字符串可以存储以下3种类型的值
 * 字符串
 * 整数
@@ -77,7 +77,7 @@ Redis中字符串操作命令
 
 ![redis_string](imgs/redis_string.png)
 
-## 2.列表List
+## 4.2.列表List
 redis列表允许用户从列表的两端推入或者弹出元素，以及执行各种常见的列表操作。除此之外，还可以作为阻塞队列使用。
 
 |命令|用例和描述|
@@ -93,7 +93,7 @@ redis列表允许用户从列表的两端推入或者弹出元素，以及执行
 
 ![redis_list](imgs/redis_list.png)
 
-## 3.集合Set
+## 4.3.集合Set
 Redis集合和列表的不同之处在于，列表可以存储多个相同的字符串，而集合通过使用散列来保证自己存储的每个字符串都是不同的。
 
 |命令|用例和描述|
@@ -109,7 +109,7 @@ Redis集合和列表的不同之处在于，列表可以存储多个相同的字
 
 ![redis_set](imgs/redis_set.png)
 
-## 4.散列Hash
+## 4.4.散列Hash
 Redis的散列可以存储多个键值对之间的映射关系。存储结构类似于Map<hashKey,Map<subKey,item>>
 
 |命令|用例和描述|
@@ -125,7 +125,7 @@ Redis的散列可以存储多个键值对之间的映射关系。存储结构类
 
 ![redis_hash](imgs/redis_hash.png)
 
-## 5.有序集合
+## 4.5.有序集合
 
 |命令|用例和描述|
 | ---- | ---- |
@@ -136,7 +136,7 @@ Redis的散列可以存储多个键值对之间的映射关系。存储结构类
 
 ![redis_zset](imgs/redis_zset.png)
 
-## 6.发布/订阅
+## 4.6.发布/订阅
 订阅者（listener）负责订阅频道（channel），发送者（publisher）负责向频道发送二进制字符串消息。每当有消息被发送到给定频道，频道的所有订阅者都会受到消息。
 
 |命令|用例和描述|
@@ -152,12 +152,12 @@ Redis的散列可以存储多个键值对之间的映射关系。存储结构类
 * 1. redis系统稳定性。如果发生消息堆积，可能会导致redis的速度变慢，甚至直接崩溃。
 * 2. 数据传输可靠性。如果客户端在执行订阅操作过程中短线，那么客户端将丢失在短线期间发送的所有消息。
 
-## 7.redis对事务的支持
+## 4.7.redis对事务的支持
 事务：一组相关的操作是原子性的，要么都执行，要么都不执行；一组事务，要么成功，要么撤回。redis通过multi、exec等命令实现事务功能。
 
 ![redis_multi](imgs/redis_multi.png)
 
-## 8. redis键的过期时间
+## 4.8. redis键的过期时间
 redis的过期时间（expiration）特性让一个键在给定的时限之后自动删除。
 
 |命令|用例和描述|
@@ -168,5 +168,59 @@ redis的过期时间（expiration）特性让一个键在给定的时限之后�
 |TTL key-name|查看给定键距离过期还有多少秒|
 |PTTL key-name|查看给定键距离过期还有多少毫秒|
 
-# 数据安全与性能保障
-## 1.Redis持久化
+# 5.数据安全与性能保障
+## 5.1 Redis持久化
+Redis提供了两种不同的持久化方法来将数据存储到硬盘。一种方法叫快照（snapshoting），它可以将存在于某一时刻的所有数据都写入硬盘。另一种方法叫只追加文件（Append-only-file,AOF）,它会在执行写命令时，将被执行的写命令复制到硬盘里面。
+
+```
+## Redis持久化选项
+
+# 60秒内有1000次写入，触发bgsave
+save 6 1000
+# 快照将被写入dbfilename选项指定的文件里面
+dbfilename dump.rdb
+
+# AOF开关 yes/no
+appendonly no
+# 同步频率，每秒一次
+appendfsync everysec
+#当AOF的体积大于64MB，且比上一次重写之后的体积大了至少1倍（100%），触发BGREWRITEAOF
+auto-aof-rewrite-percentage 100
+auto-aof-rewrite-min-size 64mb
+
+#这个选项决定了快照文件和AOF文件的保存文职
+dir ./
+```
+### 5.1.1 快照持久化
+Redis可以通过快照来获得存储在内存里面的数据在某个时间点上的副本。
+创建快照的方法：
+
+- 客户端可以通过向Redis发送**BGSAVE**命令来创建一个快照。Redis会**调用fork**命令来创建一个子进程，然后子进程负责将快照写入硬盘，而父进程则继续处理命令请求。
+- 客户端向Redis发送**SAVE**命令来创建一个快照。接到SAVE命令的Redis服务器在创建快照完毕之前将**不再响应其他任何命令**。
+- 如果用户设置了save选项，比如：save 60 1000，那么从Redis最近一次创建快照开始之后算起，当“60秒内有1000次写入”这个条件被满足时，Redis会自动触发BGSAVE命令。如果设置了多个save配置选项，那么任意一个save配置选项被满足时，Redis就会触发一次BGSAVE。
+- 当Redis通过SHUTDOWN命令接收到关闭服务器请求时，或者接收到标准TERM信号时，会执行一次SAVE命令，阻塞所有客户端，不再执行客户端发送的任何命令，并在SAVE命令执行完毕之后关闭服务器。
+- 当Redis服务器连接另一个Redis服务器，并向对方发起SYNC命令来开始一次复制操作的时候，如果主服务器目前没有执行BGSAVE操作，或者主服务器并非刚刚执行完BGSAVE操作，那么主服务器就会执行一次BGSAVE命令。
+
+**注意**：如果系统发生崩溃，用户将丢失最近一次生成快照之后的所有数据。并且当Redis存储量越大，BGSAVE在创建子进程时耗费的时间就越长。SAVE命令比BGSAVE命令执行快照时间要快。
+
+### 5.1.2 AOF持久化
+AOF持久化会将被执行的写命令写到AOF文件的末尾，以此来记录数据发生的变化。为了兼顾数据安全和写入性能，建议使用appendfsync everysec选项，让Redis以每秒一次的频率对AOF文件进行同步。Redis每秒同步一次AOF文件时的性能和不使用任何持久化时的性能相差无几。
+
+随着Redis的不断运行，AOF的体积会不断增长。为了解决AOF文件体积不断增大的问题，用户可以向Redis发送**BGWRITEAOF**命令，这个命令会通过移除AOF文件中冗余命令来重写AOF文件，使AOF文件的体积变得尽可能小。
+
+BGREWRITEAOF命令会创建一个子进程，然后子进程负责对AOF文件进行重写。AOF的持久化也可以通过设置auto-aof-rewrite-percentage选项和auto-aof-rewrite-min-size选项来自动执行BGREWRITEAOF
+
+## 5.2 复制
+复制可以让其他服务器拥有一个不断更新的数据副本，从而使得用户数据副本的服务器可以用于处理客户端发送的请求。
+
+## 5.3 Redis的高可用模式
+[Redis:详解三种集群策略](https://blog.csdn.net/q649381130/article/details/79931791)
+
+#6 分布式锁
+SETNX只能对单个节点加锁，对集群式的redis要采用redission来获得锁和释放锁
+
+
+
+
+
+
