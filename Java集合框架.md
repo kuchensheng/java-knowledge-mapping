@@ -5,7 +5,8 @@
   * ArrayList的底层是数组队列，相当于动态数组。与Java中的数组相比，它的容量动态增长。在大量添加元素前，应用程序可以使用ensureCapacity操作来增加ArrayList的容量。这可以减少递增式再分配的数量。
   * ArrayList集成于AbstractList，实现了List，Cloneable，RandomAccess和Serializable接口。
   * ArrayList核心源码
-  ```
+
+```java
   public class ArrayList<E> extends AbstractList<E>
         implements List<E>, RandomAccess, Cloneable, java.io.Serializable
 {
@@ -35,11 +36,14 @@
      */
     private int size;
 
-  ```
+    //...
+  }
 
+```
 ### 主要方法
 + add 方法
-```
+
+```java
     /**
      * 将指定的元素追加到此列表的末尾。 
      */
@@ -52,7 +56,8 @@
     }
 ```
 + ensureCapacity 方法
-```
+
+```java
     //得到最小扩容量
     private void ensureCapacityInternal(int minCapacity) {
         if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {
@@ -64,7 +69,8 @@
     }
 ```
 + ensureExplicitCapacity 方法
-```
+
+```java
 //判断是否需要扩容
     private void ensureExplicitCapacity(int minCapacity) {
         modCount++;
@@ -76,7 +82,8 @@
     }
 ```
 + grow 方法
-```
+
+```java
     /**
      * ArrayList扩容的核心方法。
      */

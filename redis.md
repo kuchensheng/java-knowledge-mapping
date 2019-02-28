@@ -34,7 +34,7 @@ Redis性能极高：Redis能读的速度是110000次/s,写的速度是81000次/s
 
 由于redis只使用单核，而 memcached 可以使用多核，所以平均每一个核上redis在存储小数据时比 memcached 性能更高。而在100k以上的数据中，memcached性能要高于redis，虽然redis最近也在存储大数据的性能上进行优化，但是比起memcached，还是稍有逊色。
 
-![Redis线程模型](https://github.com/doocs/advanced-java/blob/master/images/redis-single-thread-model.png)
+![Redis线程模型](imgs/redis-single-thread-model.png)
 
 # 什么是Redis
 Redis是完全开源的、基于内存的、高性能键值对数据库。它具备以下特性：
