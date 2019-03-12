@@ -85,8 +85,6 @@ InnoDB采用MVCC来支持高并发，并实现了四个标准的隔离级别。�
 
 InnoDB表是基于聚簇索引建立的。聚簇索引对主键查询有很高的性能。不过他的二级索引（非主键索引）中必须包含主键列，所以主键很大的话，其他的所有索引都会很大。因此，若表上的索引比较多的话，主键应当尽可能的小。
 
-[InnoDB事务模型和锁](InnoDB事务模型和锁.md)
-
 InnoDB通过一些机制和工具支持热备份，Oracle 提供的MySQL Enterprise Backup、Percona提供的开源的XtraBackup都可以。MySQL的其他引擎不支持热备份。
 
 ### 4.2 MyISAM存储引擎
