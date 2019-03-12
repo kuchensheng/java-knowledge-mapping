@@ -31,6 +31,7 @@
     * [Redis入门](redis.md)
 + 数据库
     * [Mysql入门](Mysql/Mysql入门.md)
+    * [Mysql优化-索引](Mysql/Mysql优化入门.md)
 
 ## Java基础知识 
 ### String StringBuilder和StringBuffer的区别
