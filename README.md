@@ -32,6 +32,7 @@
 + 数据库
     * [Mysql入门](Mysql/Mysql入门.md)
     * [Mysql优化-索引](Mysql/Mysql优化入门.md)
+    * [查询性能优化](Mysql/查询性能优化.md)
 
 ## Java基础知识 
 ### String StringBuilder和StringBuffer的区别
