@@ -25,6 +25,7 @@
     * [分布式服务跟踪Sleuth](SpringCloud/Sleuth.md)
     * [分布式服务框架序列化和反序列化](SpringCloud/serialize.md)
     * [服务容错保护Hystrix](SpringCloud/hystrix.md)
+    * [分布式事务](SpringCloud/分布式事务.md)
 + Kafka
   - [Kafka入门](kafka.md)
 + 缓存
