@@ -1,9 +1,9 @@
 # Java中的锁
 ![Java中的锁](imgs/Java-Lock.png)
 
-##1. Lock 接口
+## 1. Lock 接口
 锁是用来控制多个线程访问共享资源的方式，一般来说，一个锁能够防止多个线程同时访问共享资源（但是有些锁可以允许多个线程同时访问共享资源，比如读写锁）。在Lock接口出现之前，Java程序主要依靠synchronized关键字实现锁功能，Java SE 5之后，并发包中新增了Lock接口（以及其相关实现类）来实现锁功能，它提供了与synchronized关键字类似的同步功能，只是在使用时需要显示地获取和释放锁。
-###1.1 Lock的简单使用
+### 1.1 Lock的简单使用
 ```
 Lock lock=new ReentrantLock()；
 	//不能将获取锁的过程写到try块中，因为如果在获得锁时发生异常，异常抛出的同时也会导致锁无故释放
@@ -16,7 +16,7 @@ Lock lock=new ReentrantLock()；
     }
 ```
 
-###1.2 Lock接口的特性和常见方法
+## 1.2 Lock接口的特性和常见方法
 - **Lock接口拥有的synchronized不具备的主要特性**
 
 |特性|	描述|
@@ -36,7 +36,7 @@ Lock lock=new ReentrantLock()；
 |boolean tryLock(long time, TimeUnit unit)|	超时获取锁，当前线程在一下三种情况下会返回： 1. 当前线程在超时时间内获得了锁；2.当前线程在超时时间内被中断；3.超时时间结束，返回false.|
 |void unlock()|	释放锁。|
 
-##1.3 队列同步器（AQS）
+## 1.3 队列同步器（AQS）
 队列同步器（AbstractQueueSynchronizer），用来构建锁或者其他同步器的的基础框架，它使用了一个int成员变量表示同步状态，通过内置的FIFO队列来完成资源获取线程的派对工作。
 
 同步器的主要使用方式是继承，子类通过继承同步器并实现它的抽象方法来管理同步状态。
