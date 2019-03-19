@@ -153,7 +153,7 @@ protected final boolean compareAndSetState(int expect, int update) {
 
 节点是构成同步队列的基础，同步器拥有首节点head和尾节点tail，没有成功获取同步状态的线程将会成为节点加入该队列的尾部。
 
-![同步队列的基本结构](../imgs/AbstractQueueSerializer.png)
+![同步队列的基本结构](imgs/AbstractQueueSerializer.png)
 
 同步队列遵循FIFO，首节点是获取同步状态成功的节点，首节点的线程在释放同步状态时，会唤醒后继节点，而后继节点将会在获取同步状态成功时将自己设置为首节点。
 
@@ -251,7 +251,7 @@ public final boolean release(int arg) {
 ```
 独占式同步状态获取流程，也就是acquire(int arg)方法调用流程如下：
 
-![独占式同步状态获取流程](../imgs/Metrix_Lock.png)
+![独占式同步状态获取流程](imgs/Metrix_Lock.png)
 
 #### 1.3.2.3 总结
 在获取同步状态时，同步器维护一个同步队列，获取状态失败的线程都会被加入到队列中并在队列中进行自旋；移出队列或停止自旋的条件是前驱节点为头节点并且成功获取了同步状态。在释放同步状态时，同步器调用tryRelease(int arg)方法释放同步状态，然后唤醒头节点的后继节点。
