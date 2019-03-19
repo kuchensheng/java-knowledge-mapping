@@ -15,6 +15,7 @@ Lock lock=new ReentrantLock()；
     lock.unlock();
     }
 ```
+
 ###1.2 Lock接口的特性和常见方法
 - **Lock接口拥有的synchronized不具备的主要特性**
 
@@ -135,9 +136,7 @@ protected final boolean compareAndSetState(int expect, int update) {
 
 |属性类型与名称|描述
 | ----- | -----|
-|int waitStatus|等待状态。包含如下状态。
-
-① CANCLELED，值为1，由于在同步队列中等待的线程等待超时或者被中断，需要从同步队列中取消等待，节点进入该状态将不会变化。
+|int waitStatus|等待状态。包含如下状态。① CANCLELED，值为1，由于在同步队列中等待的线程等待超时或者被中断，需要从同步队列中取消等待，节点进入该状态将不会变化。
 
 ② SIGNAL,值为-1，后继节点的线程处于等待状态，而当前节点的线程如果释放了同步状态或者被取消，将会通知后继节点，使后继节点的线程得以运行。
 
