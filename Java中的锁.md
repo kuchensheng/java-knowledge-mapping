@@ -36,11 +36,58 @@ Lock lock=new ReentrantLock()；
 |void unlock()|	释放锁。|
 
 ## 队列同步器（AQS）
-队列同步器（AbstractQueueSynchronizer），用来构建锁或者其他同步器的的基础框架，它使用了一个int成员变量表示同步状态，
+队列同步器（AbstractQueueSynchronizer），用来构建锁或者其他同步器的的基础框架，它使用了一个int成员变量表示同步状态，通过内置的FIFO队列来完成资源获取线程的派对工作。
+
+同步器的主要使用方式是继承，子类通过继承同步器并实现它的抽象方法来管理同步状态。
+
+同步器提供了3个方法：getState()、setState(int newState)和compareAndSetState(int except,int update)来操作，因为它们能够保证状态的改变是安全的。
+
+子类推荐为自定义同步组件的静态内部类，同步器自身没有实现任何同步接口，它仅仅是定义了若干同步状态获取和释放的方式来供自定义同步组件使用.
+
+同步器既可以支持独占式地获取同步状态，也可以支持共享式地获取同步状态，这样就可方便地实现不同类的同步组件（ReentrantLock、ReentrantReadWriteLock和CountdownLatch)。
+
+```java
+//ReentrantLock实现、
+/**
+     * Creates an instance of {@code ReentrantLock}.
+     * This is equivalent to using {@code ReentrantLock(false)}.
+     */
+    public ReentrantLock() {
+        sync = new NonfairSync();
+    }
+
+    /**
+     * Sync object for non-fair locks
+     */
+    static final class NonfairSync extends Sync {
+        private static final long serialVersionUID = 7316153563782823691L;
+
+        /**
+         * Performs lock.  Try immediate barge, backing up to normal
+         * acquire on failure.
+         */
+        final void lock() {
+            if (compareAndSetState(0, 1))
+                setExclusiveOwnerThread(Thread.currentThread());
+            else
+                acquire(1);
+        }
+
+        protected final boolean tryAcquire(int acquires) {
+            return nonfairTryAcquire(acquires);
+        }
+    }
+
+	abstract static class Sync extends AbstractQueuedSynchronizer {...}
+
+```
+
+
 ```
 private volatile int state;//共享变量，使用volatile修饰保证线程可见性
 ```
-通过内置的FIFO队列来完成资源获取线程的排队工作。这个类在JUC包下
+
+[基于AQS实现独占锁的示例](https://github.com/kuchensheng/mermaid-framework-parent/blob/develop/modules/mermaid-common/src/main/java/com/mermaid/framework/thread/MermaidLock.java)
 
 ![AQS](imgs/AQS.png)
 
