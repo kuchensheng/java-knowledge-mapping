@@ -24,7 +24,7 @@
 + 设计模式
   - [图解设计模式](设计模式.md)
 + Spring
-    * [对于Spring中事务@Transactional注解的理解](Spring/对于Spring中事务@Transaction的理解.md)
+    * [Spring事务管理初探](Spring/Spring事务管理初探.md)
 + Spring Cloud
     * [服务的注册与发现Eureka](SpringCloud/eureka.md)
     * [服务的注册于发现Zookeeper](SpringCloud/zookeeper.md)
