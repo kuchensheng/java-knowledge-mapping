@@ -67,7 +67,7 @@ InnoDB的MVCC是通过在每行记录后面保存两个隐藏的列来实现的�
 	UPDATE tx SET close = 50 WHERE id = 3;
 	COMMIT;
 事务2
-	SSTART TRANSACATION；
+	START TRANSACATION；
 	UPDATE tx SET high = 45 WHERE id = 3;
 	UPDATE tx SET high = 50 WHERE id = 2;
 	COMMIT;
@@ -76,8 +76,22 @@ InnoDB的MVCC是通过在每行记录后面保存两个隐藏的列来实现的�
 
 InnoDB存储引擎中，当检测到死锁的循环依赖，则立即返回一个错误。并将最少行级排他锁的事务进行回滚。
 
-### 3.3 事务日志
+### 3.3 事务日志（redoLog 和undoLog）
 事务日志可以帮助提高事务的效率。使用事务日志，存储引擎在修改表的数据时只需要修改其内存拷贝，再把该修改行记录持久化到硬盘的事务日志中，而不是每次都将修改的数据本身持久化到磁盘。事务日志采用的是追加的方式。
+
+事务日志分为redo Log和undo Log。redo Log表示重做日志，提供前滚操作，undo Log是回滚日志，提供回滚操作。
+
+#### 3.3.1 redo Log 通常是物理日志，记录的是数据页的物理修改，而不是某一行货几行的修改，它用来恢复提交后的物理数据页，且只能恢复到最后一次提交的位置。
+
+redo log包括两部分：一是内存中的日志缓冲(redo log buffer)，该部分日志是易失性的；二是磁盘上的重做日志文件(redo log file)，该部分日志是持久的。
+
+在概念上，InnoDB通过force log at commit机制实现事务的持久性，即在事务提交的时候，必须先将该事务的所有事务日志写入到磁盘上的redo log file和undo log file中进行持久化。为了确保每次日志都能写入到事务日志文件中，在每次将log buffer中的日志写入日志文件的过程中都会调用一次操作系统的fsync操作(即fsync()系统调用)。因为MariaDB/MySQL是工作在用户空间的，MariaDB/MySQL的log buffer处于用户空间的内存中。要写入到磁盘上的log file中(redo:ib_logfileN文件,undo:share tablespace或.ibd文件)，中间还要经过操作系统内核空间的os buffer，调用fsync()的作用就是将OS buffer中的日志刷到磁盘上的log file中。
+
+#### 3.3.2 undo Log 用来回滚行记录到某个版本。undo log一般是逻辑日志，根据每行进行记录。
+
+undo log有两个作用：提供回滚和多个行版本控制(MVCC)。
+
+innodb存储引擎对undo的管理采用段的方式。rollback segment称为回滚段，每个回滚段中有1024个undo log segment。
 
 ## 4.Mysql存储引擎
 ### 4.1InnoDB存储引擎。
