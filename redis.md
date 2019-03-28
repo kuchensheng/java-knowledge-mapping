@@ -176,7 +176,7 @@ Redis提供了两种不同的持久化方法来将数据存储到硬盘。一种
 ## Redis持久化选项
 
 # 60秒内有1000次写入，触发bgsave
-save 6 1000
+save 60 1000
 # 快照将被写入dbfilename选项指定的文件里面
 dbfilename dump.rdb
 
@@ -216,7 +216,7 @@ BGREWRITEAOF命令会创建一个子进程，然后子进程负责对AOF文件�
 ## 5.3 Redis的高可用模式
 [Redis:详解三种集群策略](https://blog.csdn.net/q649381130/article/details/79931791)
 
-#6 分布式锁
+# 6 分布式锁
 SETNX只能对单个节点加锁，对集群式的redis要采用redission来获得锁和释放锁
 
 
