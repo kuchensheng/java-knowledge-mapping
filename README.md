@@ -26,13 +26,16 @@
 + Spring
     * [Spring事务管理初探](Spring/Spring事务管理初探.md)
 + Spring Cloud
+    * [Spring Cloud 简介](SpringCloud/Spring Cloud 简介.md)
     * [服务的注册与发现Eureka](SpringCloud/eureka.md)
-    * [服务的注册于发现Zookeeper](SpringCloud/zookeeper.md)
+    * [服务的注册与发现Zookeeper](SpringCloud/zookeeper.md)
+    * [再谈Zookeeper](SpringCloud/Zookeeper的功能与原理简介.md)
     * [客户端的负载均衡Ribbon](SpringCloud/ribbon.md)
     * [分布式服务跟踪Sleuth](SpringCloud/Sleuth.md)
     * [分布式服务框架序列化和反序列化](SpringCloud/serialize.md)
     * [服务容错保护Hystrix](SpringCloud/hystrix.md)
     * [分布式事务](SpringCloud/分布式事务.md)
+    * [分布式锁](SpringCloud/几种分布式锁的实现方式.md)
 + Kafka
   - [Kafka入门](kafka.md)
 + 缓存
@@ -41,6 +44,7 @@
     * [Mysql入门](Mysql/Mysql入门.md)
     * [Mysql优化-索引](Mysql/Mysql优化入门.md)
     * [查询性能优化](Mysql/查询性能优化.md)
+    * [SQL优化的几点建议](Mysql/SQL优化.md)
 + 高并发
   - [幂等性](高并发/幂等实现方案.md)
 
