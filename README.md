@@ -29,7 +29,7 @@
     * [Spring Cloud 简介](SpringCloud/Spring Cloud 简介.md)
     * [服务的注册与发现Eureka](SpringCloud/eureka.md)
     * [服务的注册与发现Zookeeper](SpringCloud/zookeeper.md)
-    * [再谈Zookeeper](SpringCloud/Zookeeper的功能与原理简介.md)
+    * [再谈Zookeeper](分布式/Zookeeper的功能及原理简介.md)
     * [客户端的负载均衡Ribbon](SpringCloud/ribbon.md)
     * [分布式服务跟踪Sleuth](SpringCloud/Sleuth.md)
     * [分布式服务框架序列化和反序列化](SpringCloud/serialize.md)
