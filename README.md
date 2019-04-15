@@ -47,6 +47,8 @@
     * [SQL优化的几点建议](Mysql/SQL优化.md)
 + 高并发
   - [幂等性](高并发/幂等实现方案.md)
++ 软件设计
+  - [面向对象基础](面向对象技术.md)
 
 ## Java基础知识 
 ### String StringBuilder和StringBuffer的区别
