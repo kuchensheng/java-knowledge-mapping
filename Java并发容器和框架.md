@@ -126,4 +126,4 @@ public ArrayBlockingQueue(int capacity, boolean fair) {
         }
     }
 ```
-更多详细信息可以阅读《[解读Java并发队列BlockingQueue]https://javadoop.com/post/java-concurrent-queue)》
+更多详细信息可以阅读《[解读Java并发队列BlockingQueue](https://javadoop.com/post/java-concurrent-queue)》
