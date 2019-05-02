@@ -1,0 +1,5 @@
+Sweet框架中选用Spring Cloud Eureka的原因
+1、Spring Cloud Netflix的生态好，社区活跃，易于集成和扩展。容易与其他Netflix组件（Hystrix、Ribbon、Zuul）或者Spring Cloud的其他组件进行整合
+2、现有的Zookeeper服务和发现中心，只支持客户端接入，对跨语言支持较弱
+3、Zookeeper基于CP，强调强一致性，作为分布式场景下的服务发现不太合适，特别地，在广域网（网络不稳定）情况下，容易出现因为网络波动导致客户端任务不健康的情况
+4、Zookeeper并没有提供对自身集群的监控，而Eureka默认支持metrics，运维者可以搜集并报警这些度量信息达到监控目的
