@@ -211,4 +211,207 @@ Eureka Server在启动时会创建一个定时任务，默认每隔一段时间�
     - 自我保护
 不建议使用
 
+## Eureka注册过程分析
+### Eureka服务端
+Eureka的服务端的核心类是EurekaBootStrap，该类实现了一个ServletContextListener的监听器，因此我们可以断定eureka是基于servlet容器实现的。在容器启动之初，调用ServletContextListener的contextInitialized方法，其关键代码如下：
+```java
+public class EurekaBootStrap implements ServletContextListener {
+	//省略代码...
+	@Override
+    public void contextInitialized(ServletContextEvent event) {
+        try {
+        	//初始化Eureka环境
+            initEurekaEnvironment();
+            //初始化EurekaServerContext
+            initEurekaServerContext();
 
+            ServletContext sc = event.getServletContext();
+            sc.setAttribute(EurekaServerContext.class.getName(), serverContext);
+        } catch (Throwable e) {
+            logger.error("Cannot bootstrap eureka server :", e);
+            throw new RuntimeException("Cannot bootstrap eureka server :", e);
+        }
+    }
+}
+
+protected void initEurekaServerContext() throws Exception {
+        //省略代码...
+        ApplicationInfoManager applicationInfoManager = null;
+
+        if (eurekaClient == null) {
+            EurekaInstanceConfig instanceConfig = isCloud(ConfigurationManager.getDeploymentContext())
+                    ? new CloudInstanceConfig()
+                    : new MyDataCenterInstanceConfig();
+            
+            applicationInfoManager = new ApplicationInfoManager(
+                    instanceConfig, new EurekaConfigBasedInstanceInfoProvider(instanceConfig).get());
+            
+            EurekaClientConfig eurekaClientConfig = new DefaultEurekaClientConfig();
+            eurekaClient = new DiscoveryClient(applicationInfoManager, eurekaClientConfig);
+        } else {
+            applicationInfoManager = eurekaClient.getApplicationInfoManager();
+        }
+
+        PeerAwareInstanceRegistry registry;
+        if (isAws(applicationInfoManager.getInfo())) {
+            registry = new AwsInstanceRegistry(
+                    eurekaServerConfig,
+                    eurekaClient.getEurekaClientConfig(),
+                    serverCodecs,
+                    eurekaClient
+            );
+            awsBinder = new AwsBinderDelegate(eurekaServerConfig, eurekaClient.getEurekaClientConfig(), registry, applicationInfoManager);
+            awsBinder.start();
+        } else {
+            registry = new PeerAwareInstanceRegistryImpl(
+                    eurekaServerConfig,
+                    eurekaClient.getEurekaClientConfig(),
+                    serverCodecs,
+                    eurekaClient
+            );
+        }
+
+        PeerEurekaNodes peerEurekaNodes = getPeerEurekaNodes(
+                registry,
+                eurekaServerConfig,
+                eurekaClient.getEurekaClientConfig(),
+                serverCodecs,
+                applicationInfoManager
+        );
+
+        serverContext = new DefaultEurekaServerContext(
+                eurekaServerConfig,
+                serverCodecs,
+                registry,
+                peerEurekaNodes,
+                applicationInfoManager
+        );
+
+        EurekaServerContextHolder.initialize(serverContext);
+
+        serverContext.initialize();
+        logger.info("Initialized server context");
+
+        // Copy registry from neighboring eureka node
+        int registryCount = registry.syncUp();
+        registry.openForTraffic(applicationInfoManager, registryCount);
+
+        // Register all monitoring statistics.
+        EurekaMonitors.registerAllStats();
+    }
+```
+在方法initEurekaServletContext()方法中会创建很多与eureka服务相关的对象，两个核心对象分别是EurekaClient和PeerAwareInstanceRegistry。其中PeerAwareInstanceRegistry的类图如下：
+
+![PeerAwareInstanceRegistry](../imgs/PeerAwareInstanceRegistry.png)
+
+那么PeerAwareInstanceRegistry这个类用于多个节点复制相关信息，比如说一个节点注册续约与下线，那么这个类将会把相关复制（通知）到各个节点。
+
+```java
+// com.netflix.eureka.registry.PeerAwareInstanceRegistryImpl#register
+@Override
+    public void register(final InstanceInfo info, final boolean isReplication) {
+    	//获取默认的定义服务失效的时间90s
+        int leaseDuration = Lease.DEFAULT_DURATION_IN_SECS;
+        if (info.getLeaseInfo() != null && info.getLeaseInfo().getDurationInSecs() > 0) {
+            leaseDuration = info.getLeaseInfo().getDurationInSecs();
+        }
+        //调用父类的register方法，然后又通过replicationToPeers复制对应的行为到其他节点
+        super.register(info, leaseDuration, isReplication);
+        replicateToPeers(Action.Register, info.getAppName(), info.getId(), info, null, isReplication);
+    }
+
+//PeerAwareInstanceRegistyImpl的服务类的register方法 com.netflix.eureka.registry.AbstractInstanceRegistry#register
+public void register(InstanceInfo registrant, int leaseDuration, boolean isReplication) {
+        try {
+            read.lock();
+            //根据AppName获取相关的服务实例对象
+            Map<String, Lease<InstanceInfo>> gMap = registry.get(registrant.getAppName());
+            //EurekaMonitor的注册行为加1
+            REGISTER.increment(isReplication);
+            //如果为Null，则创建一个新的map，并把当前的注册应用程序信息添加到此Map中。
+            //这里有个Lease对象，这个类描述了泛型T的时间属性，比如注册时间、服务启动时间、最后更新时间等。
+            if (gMap == null) {
+                final ConcurrentHashMap<String, Lease<InstanceInfo>> gNewMap = new ConcurrentHashMap<String, Lease<InstanceInfo>>();
+                gMap = registry.putIfAbsent(registrant.getAppName(), gNewMap);
+                if (gMap == null) {
+                    gMap = gNewMap;
+                }
+            }
+
+            //根据当前注册的ID，获取Lease对象信息
+            Lease<InstanceInfo> existingLease = gMap.get(registrant.getId());
+            // Retain the last dirty timestamp without overwriting it, if there is already a lease
+            //如果能在gMap中获取
+            if (existingLease != null && (existingLease.getHolder() != null)) {
+                Long existingLastDirtyTimestamp = existingLease.getHolder().getLastDirtyTimestamp();
+                Long registrationLastDirtyTimestamp = registrant.getLastDirtyTimestamp();
+                logger.debug("Existing lease found (existing={}, provided={}", existingLastDirtyTimestamp, registrationLastDirtyTimestamp);
+
+                //根据当前存在节点的触碰时间和注册节点的触碰时间的比较，如果前者晚于后者，则当前注册的实例就以已存在的实例为准
+                if (existingLastDirtyTimestamp > registrationLastDirtyTimestamp) {
+                    logger.warn("There is an existing lease and the existing lease's dirty timestamp {} is greater" +
+                            " than the one that is being registered {}", existingLastDirtyTimestamp, registrationLastDirtyTimestamp);
+                    logger.warn("Using the existing instanceInfo instead of the new instanceInfo as the registrant");
+                    registrant = existingLease.getHolder();
+                }
+            } else {
+            	// 更新其每分钟期望的续约数量和阈值
+                // The lease does not exist and hence it is a new registration
+                synchronized (lock) {
+                    if (this.expectedNumberOfRenewsPerMin > 0) {
+                        // Since the client wants to cancel it, reduce the threshold
+                        // (1
+                        // for 30 seconds, 2 for a minute)
+                        this.expectedNumberOfRenewsPerMin = this.expectedNumberOfRenewsPerMin + 2;
+                        this.numberOfRenewsPerMinThreshold =
+                                (int) (this.expectedNumberOfRenewsPerMin * serverConfig.getRenewalPercentThreshold());
+                    }
+                }
+                logger.debug("No previous lease information found; it is new registration");
+            }
+
+            //将当前的注册节点存到Map中
+            Lease<InstanceInfo> lease = new Lease<InstanceInfo>(registrant, leaseDuration);
+            if (existingLease != null) {
+                lease.setServiceUpTimestamp(existingLease.getServiceUpTimestamp());
+            }
+            gMap.put(registrant.getId(), lease);
+            synchronized (recentRegisteredQueue) {
+                recentRegisteredQueue.add(new Pair<Long, String>(
+                        System.currentTimeMillis(),
+                        registrant.getAppName() + "(" + registrant.getId() + ")"));
+            }
+            // This is where the initial state transfer of overridden status happens
+            if (!InstanceStatus.UNKNOWN.equals(registrant.getOverriddenStatus())) {
+                logger.debug("Found overridden status {} for instance {}. Checking to see if needs to be add to the "
+                                + "overrides", registrant.getOverriddenStatus(), registrant.getId());
+                if (!overriddenInstanceStatusMap.containsKey(registrant.getId())) {
+                    logger.info("Not found overridden id {} and hence adding it", registrant.getId());
+                    overriddenInstanceStatusMap.put(registrant.getId(), registrant.getOverriddenStatus());
+                }
+            }
+            InstanceStatus overriddenStatusFromMap = overriddenInstanceStatusMap.get(registrant.getId());
+            if (overriddenStatusFromMap != null) {
+                logger.info("Storing overridden status {} from map", overriddenStatusFromMap);
+                registrant.setOverriddenStatus(overriddenStatusFromMap);
+            }
+
+            // Set the status based on the overridden status rules
+            InstanceStatus overriddenInstanceStatus = getOverriddenInstanceStatus(registrant, existingLease, isReplication);
+            registrant.setStatusWithoutDirty(overriddenInstanceStatus);
+
+            // If the lease is registered with UP status, set lease service up timestamp
+            if (InstanceStatus.UP.equals(registrant.getStatus())) {
+                lease.serviceUp();
+            }
+            registrant.setActionType(ActionType.ADDED);
+            recentlyChangedQueue.add(new RecentlyChangedItem(lease));
+            registrant.setLastUpdatedTimestamp();
+            invalidateCache(registrant.getAppName(), registrant.getVIPAddress(), registrant.getSecureVipAddress());
+            logger.info("Registered instance {}/{} with status {} (replication={})",
+                    registrant.getAppName(), registrant.getId(), registrant.getStatus(), isReplication);
+        } finally {
+            read.unlock();
+        }
+    }
+```
