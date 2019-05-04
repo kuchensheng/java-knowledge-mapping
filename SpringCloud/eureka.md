@@ -500,3 +500,6 @@ protected void initEurekaServerContext() throws Exception {
 2）创建发送心跳与刷新缓存的线程池
 
 3）初始化创建的定时任务
+
+### 服务调用
+服务消费者在获取服务清单后，通过服务名可以获得具体提供服务的实例名和该实例的元数据信息。对于访问实例的选择，Eureka中有Region和Zone的概念，一个Region可以包含多个Zone，每个服务客户端需要被注册到一个Zone中，所以每个客户端对应一个Region和一个Zone。在进行服务调用时，优先访问同一个Zone中的服务提供方，如果访问不到，再访问其他的Zone。
