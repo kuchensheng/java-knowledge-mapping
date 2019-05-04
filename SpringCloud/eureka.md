@@ -9,6 +9,12 @@
 # 服务治理：Spring Cloud Eureka
 
 Spring Cloud Eureka是Spring Cloud Netflix微服务套件中的一部分，它基于Netflix Eureka做了二次封装，主要负责完成微服务架构中的服务治理功能。
+Netflix Eureka既包含了服务端组件，也包含了客户端组件。
+
+**Eureka服务端**：也成为服务注册中心，它同其他服务注册中心一样，支持高可用配置。如果Eureka以集群模式进行部署，当集权中有分片出现故障时，那么Eureka就转入自我保护模式。它允许在分片故障期间继续提供服务的发现和注册，当分片故障恢复运行时，集群中的其他分片会把它们的状态再次同步回来。以在AWS上的实践为例，Netflix推荐每个可用的区域运行一个Eureka服务端，通过它来形成集群。不同可用区域的服务注册中心通过异步模式互相复制各自的状态，这意味着任意给定的时间点，每个实例关于所有服务的状态是有细微差别的。
+
+**Eureka客户端**：主要处理服务的注册与发现。客户端通过注解和参数配置的方式，嵌入在客户端应用程序的代码中，在应用程序运行期间，Eureka客户端向注册中心注册自身提供的服务并周期性地发送心跳来更新它的服务租约。同时，它也能从服务端查询当前注册的服务信息并把它们缓存到本地并周期性地刷新服务状态。
+
 ## 服务治理
 服务治理是微服务架构中最为核心和基础的模块，它主要用来实现各个微服务实例的自动化注册和发现。
 ### 服务注册
@@ -415,3 +421,82 @@ public void register(InstanceInfo registrant, int leaseDuration, boolean isRepli
         }
     }
 ```
+### Eureka客户端
+在服务端ServletContextListener初始化完毕时，会创建DiscoveryClient。
+```java
+protected void initEurekaServerContext() throws Exception {
+       	//省略代码...
+        if (this.eurekaClient == null) {
+            registry = this.isCloud(ConfigurationManager.getDeploymentContext()) ? new CloudInstanceConfig() : new MyDataCenterInstanceConfig();
+            applicationInfoManager = new ApplicationInfoManager((EurekaInstanceConfig)registry, (new EurekaConfigBasedInstanceInfoProvider((EurekaInstanceConfig)registry)).get());
+            EurekaClientConfig eurekaClientConfig = new DefaultEurekaClientConfig();
+            //创建DiscoveryClient
+            this.eurekaClient = new DiscoveryClient(applicationInfoManager, eurekaClientConfig);
+        } else {
+            applicationInfoManager = this.eurekaClient.getApplicationInfoManager();
+        }
+
+        if (this.isAws(applicationInfoManager.getInfo())) {
+            registry = new AwsInstanceRegistry(eurekaServerConfig, this.eurekaClient.getEurekaClientConfig(), serverCodecs, this.eurekaClient);
+            this.awsBinder = new AwsBinderDelegate(eurekaServerConfig, this.eurekaClient.getEurekaClientConfig(), (PeerAwareInstanceRegistry)registry, applicationInfoManager);
+            this.awsBinder.start();
+        } else {
+            registry = new PeerAwareInstanceRegistryImpl(eurekaServerConfig, this.eurekaClient.getEurekaClientConfig(), serverCodecs, this.eurekaClient);
+        }
+
+        //省略代码...
+    }
+
+//从DiscoveryClient的构造器中可以看出，如果fetchReigistry与registryWithEureka都不为false，那么启动就会报错。
+ @Inject
+    DiscoveryClient(ApplicationInfoManager applicationInfoManager, EurekaClientConfig config, AbstractDiscoveryClientOptionalArgs args, Provider<BackupRegistry> backupRegistryProvider) {
+        //省略代码...
+        if (!config.shouldRegisterWithEureka() && !config.shouldFetchRegistry()) {
+        	//当这两个属性都为false时，不会启动定时任务和心跳
+            logger.info("Client configured to neither register nor query for data.");
+            this.scheduler = null;
+            this.heartbeatExecutor = null;
+            this.cacheRefreshExecutor = null;
+            this.eurekaTransport = null;
+            this.instanceRegionChecker = new InstanceRegionChecker(new PropertyBasedAzToRegionMapper(config), this.clientConfig.getRegion());
+            DiscoveryManager.getInstance().setDiscoveryClient(this);
+            DiscoveryManager.getInstance().setEurekaClientConfig(config);
+            this.initTimestampMs = System.currentTimeMillis();
+            logger.info("Discovery Client initialized at timestamp {} with initial instances count: {}", this.initTimestampMs, this.getApplications().size());
+        } else {
+            try {
+                this.scheduler = Executors.newScheduledThreadPool(2, (new ThreadFactoryBuilder()).setNameFormat("DiscoveryClient-%d").setDaemon(true).build());
+                this.heartbeatExecutor = new ThreadPoolExecutor(1, this.clientConfig.getHeartbeatExecutorThreadPoolSize(), 0L, TimeUnit.SECONDS, new SynchronousQueue(), (new ThreadFactoryBuilder()).setNameFormat("DiscoveryClient-HeartbeatExecutor-%d").setDaemon(true).build());
+                this.cacheRefreshExecutor = new ThreadPoolExecutor(1, this.clientConfig.getCacheRefreshExecutorThreadPoolSize(), 0L, TimeUnit.SECONDS, new SynchronousQueue(), (new ThreadFactoryBuilder()).setNameFormat("DiscoveryClient-CacheRefreshExecutor-%d").setDaemon(true).build());
+                this.eurekaTransport = new DiscoveryClient.EurekaTransport(null);
+                this.scheduleServerEndpointTask(this.eurekaTransport, args);
+                Object azToRegionMapper;
+                if (this.clientConfig.shouldUseDnsForFetchingServiceUrls()) {
+                    azToRegionMapper = new DNSBasedAzToRegionMapper(this.clientConfig);
+                } else {
+                    azToRegionMapper = new PropertyBasedAzToRegionMapper(this.clientConfig);
+                }
+
+                if (null != this.remoteRegionsToFetch.get()) {
+                    ((AzToRegionMapper)azToRegionMapper).setRegionsToFetch(((String)this.remoteRegionsToFetch.get()).split(","));
+                }
+
+                this.instanceRegionChecker = new InstanceRegionChecker((AzToRegionMapper)azToRegionMapper, this.clientConfig.getRegion());
+            } catch (Throwable var9) {
+                throw new RuntimeException("Failed to initialize DiscoveryClient!", var9);
+            }
+
+            //省略部分代码
+            this.initScheduledTasks();
+
+            //省略部分代码...
+        }
+    }
+```
+
+通过源码分析，我们可以得出结论：
+1）如果shouldRegisterWithEureka与shouldFetchRegistry都为false,那么直接return。
+
+2）创建发送心跳与刷新缓存的线程池
+
+3）初始化创建的定时任务
