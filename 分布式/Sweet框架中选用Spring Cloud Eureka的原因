@@ -1,5 +1,16 @@
-Sweet框架中选用Spring Cloud Eureka的原因
-1、Spring Cloud Netflix的生态好，社区活跃，易于集成和扩展。容易与其他Netflix组件（Hystrix、Ribbon、Zuul）或者Spring Cloud的其他组件进行整合
-2、现有的Zookeeper服务和发现中心，只支持客户端接入，对跨语言支持较弱
-3、Zookeeper基于CP，强调强一致性，作为分布式场景下的服务发现不太合适，特别地，在广域网（网络不稳定）情况下，容易出现因为网络波动导致客户端任务不健康的情况
-4、Zookeeper并没有提供对自身集群的监控，而Eureka默认支持metrics，运维者可以搜集并报警这些度量信息达到监控目的
+# Sweet框架中选用Spring Cloud Eureka的原因
+1、 Spring Cloud Netflix的生态好，社区活跃，易于集成和扩展。容易与其他Netflix组件（Hystrix、Ribbon、Zuul）或者Spring Cloud的其他组件进行整合
+2、 现有的Zookeeper服务和发现中心，只支持客户端接入，对跨语言支持较弱
+3、 Zookeeper基于CP，强调强一致性，作为分布式场景下的服务发现不太合适，特别地，在广域网（网络不稳定）情况下，容易出现因为网络波动导致客户端任务不健康的情况
+4、 Zookeeper并没有提供对自身集群的监控，而Eureka默认支持metrics，运维者可以搜集并报警这些度量信息达到监控目的
+
+# Sweet框架中选用RabbitMQ的原因
+1. 虽然RabbitMQ只支持主从模式，扩展性不好，不支持分布式，但是在业务场景中，主从模式也能够满足绝大部分业务场景，比如流量的削峰填谷、业务的解耦、异步
+2. Kafka虽然吞吐量大、可水平扩展，但是它没有重发机制，不保证数据的百分之百送达。会有数据丢失。适用于日志数据、统计数据等大数据量流转
+3. ActiveMQ对JMS支持最好，采用多线程并发，资源消耗比较大，由于历史悠久、历史包袱较多，集群模式需要依赖zookeeper实现。但是ActiveMQ支持多种语言和协议编写客户端，完全支持JMS1.1，支持多种传送协议，支持Ajax。所以可以重点考虑。但是由于系统本身的历史原因，我们还是选择了RabbitMQ
+4. RocketMQ出身名门，采用分布式集群技术，注重低延迟、高可靠。但是使用者少，生态圈小。而且Rocket MQ不保证消息的不重复发送和消费。在服务启停时，可能会发生消息的重复
+5. Rabbit MQ基于Erlanger语言开发，并发能力强，延时低，管理界面丰富，且是AMQP协议领先的一个实现。实现了代理（Broker）架构，生态丰富，使用者众多，性能稳定。而且Rabbit MQ提供了transaction和confirm模式来保证了生产者不会丢消息。虽然这会造成吞吐率的下降，但是在业务场景中，完全可以接受。
+
+# Rabbit MQ的消息发送过程
+
+Producer将消息发送到Exchange（交换器），Binding将Exchange和Queue绑定起来。然后Exchange根据绑定规则RoutingKey将消息路由到队列。RoutingKey依赖Exchange Types（fanout、direct、topic、headers），其中fanout会把所有发送到exchange的消息路由到与它绑定的Queue中。direct会把消息路由到那些binding key与routing key完全匹配的Queue中。topic将消息路由到binding key和routing key 正则匹配的Queue中。headers而是根据发送的消息内容中的headers属性进行匹配。
