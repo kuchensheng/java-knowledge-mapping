@@ -25,4 +25,17 @@
 ```
 docker run :Run a command in a new container
 
+docker create 
+docker start
+docker restart
 ```
+# 4 Docker中的网络功能
+docker在安装时其实是安装了网络两端。在宿主机安装veth -> 虚拟网卡.在docker容器中安装eth0 网卡模块，进行通信。
+## 4.1 查看网桥
+brctl show 查看网桥
+## 4.2 修改网段配置
+cat /etc/docker/daemon.json添加内容“bip”:"ip/netmask"
+## 4.3 外部访问容器
+可以通过 -P或-p参数来指定端口映射。
+
+# 5 数据卷
