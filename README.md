@@ -12,21 +12,30 @@
 # 目录
 + Java
   - [Java基础知识](#java基础知识)
-  - [Java集合框架](Java集合框架.md)
-  - [Java多线程](Java多线程.md)
-  - [Java中的锁](Java中的锁.md)
-  - [Java并发容器和框架](Java并发容器和框架.md)
-  - [JDK 1.8新特性](JDK1.8新特性.md)
+  - [Java集合框架](JavaCore/Java集合框架.md)
+  - [Java多线程](JavaCore/Java多线程.md)
+  - [Java中的锁](JavaCore/Java中的锁.md)
+  - [Java并发容器和框架](JavaCore/Java并发容器和框架.md)
+  - [JDK 1.8新特性](JavaCore/JDK1.8新特性.md)
+  - [Java并发编程基础](JavaCore/Java并发编程基础.md)
+  - [Java并发机制的底层原理实现](JavaCore/Java并发机制的底层原理实现.md)
+  - [Java内存模型](JavaCore/Java内存模型.md)
+  - [并发编程的挑战](JavaCore/并发编程的挑战.md)
 + Java虚拟机
-  - [Java虚拟机实战](Java虚拟机实战.md)
-  - [虚拟机性能监控与故障处理工具](虚拟机性能监控工具.md)
-  - [虚拟机类加载机制浅析](虚拟机类加载机制.md)
+  - [Java虚拟机实战](JVM/Java虚拟机实战.md)
+  - [虚拟机性能监控与故障处理工具](JVM/虚拟机性能监控工具.md)
+  - [虚拟机类加载机制浅析](JVM/虚拟机类加载机制.md)
+  - [虚拟机常用参数](JVM/虚拟机常用参数.md)
 + 设计模式
-  - [图解设计模式](设计模式.md)
+  - [图解设计模式](设计模式/设计模式.md)
++ Kubernetes
+  - [docker介绍](Kubernetes/docker介绍.md)
+  - [初步了解Kubernetes](Kubernetes/初步了解Kubernetes.md)
+  - [虚拟化docker介绍](Kubernetes/虚拟化docker介绍.md)
 + Spring
     * [Spring事务管理初探](Spring/Spring事务管理初探.md)
 + Spring Cloud
-    * [Spring Cloud 简介](SpringCloud/Spring Cloud 简介.md)
+    * [Spring Cloud 简介](SpringCloud/SpringCloud简介.md)
     * [服务的注册与发现Eureka](SpringCloud/eureka.md)
     * [服务的注册与发现Zookeeper](SpringCloud/zookeeper.md)
     * [再谈Zookeeper](分布式/Zookeeper的功能及原理简介.md)
