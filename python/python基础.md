@@ -92,3 +92,45 @@ python真正的用除法代替了floor方式，比如
 ```and not or```
 python 允许 3 < 4 < 5成立，这相当远 3 < 4 and 4 < 5
 
+# 条件表达式
+a = x if 条件 else y
+例如：small = x if x < y else y
+
+# 断言
+当关键字assert后面的关键字为假时，程序自动崩溃并抛出AssertionError异常
+assert 3 > 4 异常
+
+# 循环语句
+## for循环
+python的for循环自动调用迭代器的next()方法，会自动捕获StopIteration异常并结束循环
+```
+favourite = "库陈胜"
+for each in favourite :
+    print(each,end='')
+执行结果 库陈胜
+```
+## range()
+语法：range([start],stop[,step=1])
+示例：
+```
+for i in range(5):
+    print(i)
+for j in range(2,9):
+    print(j)
+for k in range(1,10,3):
+    print(k)
+```
+## break/continue语句
+break语句的作用是终止当前循环体，
+continue跳过这次循环
+
+# 列表、元组合字符串
+## 列表
+Python的变量没有数据类型，所以Python是没有数组的。但是可以创建一个鱼龙混杂的列表。
+- **append()**:添加元素
+- **extend()**:使用一个列表来扩展另一个列表
+- **insert(index,val)**:往列表中插入元素，两个参数表示位置和值
+- 通过索引值获取元素
+```
+
+```
