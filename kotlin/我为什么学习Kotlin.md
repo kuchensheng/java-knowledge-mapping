@@ -4,8 +4,6 @@
 ## Kotlin是什么
 Kotlin是一种非研究性并且非常务实的工业级编程语言，它的使命就是帮助程序员解决实际工程实践中的问题。使用Kotlin语言让Java程序员的工作变得更轻松，Java语言中的那些空指针错误、浪费时间的冗长的样板代码、啰嗦的语法限制等，在Kotlin语言中统统消失。
 Kotlin语言简单、务实，语法简洁而强大，安全且表达力强，极富生产力。
-Kotlin是一种非研究性并且非常务实的工业级编程语言，它的使命就是帮助程序员解决实际工程实践中的问题。使用Kotlin语言让Java程序员的工作变得更轻松，Java语言中的那些空指针错误、浪费时间的冗长的样板代码、啰嗦的语法限制等，在Kotlin语言中统统消失。
-Kotlin语言简单、务实，语法简洁而强大，安全且表达力强，极富生产力。
 
 Kotlin是一种基于JVM的静态类型编程语言。Kotlin编译为字节码，因此其性能与Java 一样好。它具有与Java 相同的编译时检查。最重要的是Kotlin的语言功能和标准库功能可实现简洁高效的代码。
 
@@ -43,7 +41,7 @@ fun main(args: Array<String>) {
 }
 ```
 说明如下：
-（1）：Kotlin中包package的使用与Java基本相同。有一点不同的是Kotlin的package命名可以与包路径不同。
+（1）：Kotlin中包package的使用与Java基本相同。有一点不同的是Kotlin的package命名可以与包路径不同(可以是相对路径)
 （2）：Kotlin变量声明args:Array类似于Pascal，先写变量名args，冒号隔开，再在后面写变量的类型Array。与Scala和Groovy一样，代码行末尾的分号是可选的，在大多数情况下，编译器根据换行符就能够推断语句已经结束。Kotlin中使用fun关键字声明函数（方法），充满乐趣的fun。
 （3）：Kotlin中的打印函数是println()（虽然背后封装的仍然是Java的System.out.println()方法）。Kotlin中支持字符串模板$name，如果是表达式，则使用${expression}语法。
 
@@ -56,6 +54,11 @@ fun getArrayList(): List<String> {
     arrayList.add("C")
     return arrayList
 }
+## 或者可以这样
+fun getArrayList() = arrayListOf("A","B","C")
+
+## 甚至可以这样
+fun getArrayList() = listOf("A","B","C")
 ```
 说明如下。
 （1）：声明了一个返回List<String>的函数，我们看到在Kotlin中使用fun关键字来声明函数。

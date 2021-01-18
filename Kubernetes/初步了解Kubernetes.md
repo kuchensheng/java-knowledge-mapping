@@ -161,6 +161,7 @@ Events:
 ## 5.3 Pod
 Pod是Kubernetes最重要的基本概念，每个Pod都有一个特殊的根容器-**Pause容器**。Pause容器的状态代表了整个容器组的状态。Pod里的多个业务容器共享Pause容器的IP，共享Pause容器挂载的Volume，解决了密切关联的业务容器之间的通信问题，也解决了他们之间的文件共享问题。
 Pod资源定义文件：
+
 ```
 apiVersion: v1
 kind: Pod
@@ -260,9 +261,6 @@ Deployment用于更好地解决Pod的编排问题。为此Deployment在内部使
 - 查看Deployment的状态，以此作为发布是否成功的指标
 - 清理不再需要的旧版本ReplicaSets。
 
-```
-
-```
 ```
 apiVersion: extensions/v1beta1
 kind: Deployment
